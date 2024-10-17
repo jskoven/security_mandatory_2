@@ -26,14 +26,24 @@ def start_server():
         with context.wrap_socket(client, server_side=True) as tls_socket:
             print(f"Connection established with {addr}")
 
-            # Receive and print Bob's message
-            data = tls_socket.recv(1024)
-            print(f"Message: {data.decode('utf-8')}")
-            client.close()
+            # Receive and print the patient's message
+            try:
+                data = tls_socket.recv(2048)  # Blocking call, waits for incoming data
+                if data:
+                    print(f"Received data: {data.decode('utf-8')}")
+                else:
+                    print("Received empty message")
+
+            except Exception as e:
+                print(f"Error receiving data: {e}")
+            
+            client.close()  # Close the connection
+            counter += 1
             print("Counter: ", counter)
-            if counter == 2:
-                exit()
-            else:
-                counter+=1
+
+            # Exit after receiving 3 messages
+            if counter == 3:
+                print("All patient data received, exiting...")
+                break
 
 start_server()
